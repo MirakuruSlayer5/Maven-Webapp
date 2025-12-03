@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+    triggers {
+        // This line within the script itself is an alternative way to enable the trigger for declarative pipelines
+        // It relies on Jenkins global configuration to handle the actual receipt of the webhook.
+        githubPush() 
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                // The 'git' step will automatically use the repository URL defined in the job configuration
+                git branch: 'main', url: '
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Building the project...'
+                // Add your build commands here
+                sh './build.sh' 
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                
+                sh './test.sh' 
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Build, test, and run steps completed successfully.'
+        }
+        failure {
+            echo 'One or more steps failed.'
+        }
+    }
+}
